@@ -103,8 +103,8 @@ export function Sidebar() {
           </div>
         ) : (
           <div className="py-2">
-            {conversations.map((conv) => (
-              <ConversationItem key={conv._id} conversation={conv} />
+            {conversations.map((conv: any) => (
+              <ConversationItem key={conv._id} conversation={conv as any} />
             ))}
           </div>
         )}

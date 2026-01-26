@@ -7,6 +7,15 @@ import { AuthProvider } from './contexts/AuthContext'
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string)
 
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // Service worker registration failed silently
+    });
+  });
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConvexProvider client={convex}>
