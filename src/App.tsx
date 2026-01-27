@@ -1,10 +1,26 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
 import { LoginPage } from './components/LoginPage';
 import { ChatLayout } from './components/ChatLayout';
+import { AdminPage } from './components/AdminPage';
 
 function App() {
   const { user, isLoading } = useAuth();
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path);
+  };
 
   if (isLoading) {
     return (
@@ -19,6 +35,14 @@ function App() {
         </div>
       </div>
     );
+  }
+
+  // Admin page - accessible even without login for stats viewing
+  if (currentPath === '/admin') {
+    if (!user) {
+      return <LoginPage />;
+    }
+    return <AdminPage onBack={() => navigateTo('/')} />;
   }
 
   if (!user) {

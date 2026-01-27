@@ -181,6 +181,11 @@ export function LoginPage() {
               }
             </button>
           </div>
+
+          {/* Attribution - subtle footer */}
+          <p className="mt-12 text-center text-xs text-gray-light">
+            Made by @Yashas.VM
+          </p>
         </div>
       </div>
     </div>

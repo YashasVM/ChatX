@@ -1,3 +1,8 @@
+import { useState } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { Trash2 } from 'lucide-react';
+
 interface Sender {
   _id: string;
   displayName: string;
@@ -19,6 +24,7 @@ interface MessageBubbleProps {
   showAvatar: boolean;
   isFirstInGroup: boolean;
   isLastInGroup: boolean;
+  currentUserId: string;
 }
 
 export function MessageBubble({
@@ -27,12 +33,33 @@ export function MessageBubble({
   showAvatar,
   isFirstInGroup,
   isLastInGroup,
+  currentUserId,
 }: MessageBubbleProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteMessage = useMutation(api.messages.deleteMessage);
+
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this message?')) return;
+    setIsDeleting(true);
+    try {
+      await deleteMessage({
+        messageId: message._id as any,
+        userId: currentUserId as any,
+      });
+    } catch (error) {
+      console.error('Failed to delete message:', error);
+    } finally {
+      setIsDeleting(false);
+      setShowMenu(false);
+    }
   };
 
   // Determine border radius based on position in message group
@@ -77,15 +104,29 @@ export function MessageBubble({
         )}
 
         <div
-          className={`px-4 py-2.5 ${getBorderRadius()} ${
+          className={`relative group px-4 py-2.5 ${getBorderRadius()} ${
             isOwn
               ? 'bg-charcoal text-cream'
               : 'bg-white text-charcoal border border-border'
-          }`}
+          } ${isDeleting ? 'opacity-50' : ''}`}
+          onMouseEnter={() => isOwn && setShowMenu(true)}
+          onMouseLeave={() => setShowMenu(false)}
         >
           <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">
             {message.content}
           </p>
+
+          {/* Delete button - only for own messages */}
+          {isOwn && showMenu && !isDeleting && (
+            <button
+              onClick={handleDelete}
+              className="absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 bg-white border border-border rounded-lg
+                       text-gray hover:text-red hover:border-red transition-colors shadow-sm"
+              title="Delete message"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Time (only on last message of group) */}

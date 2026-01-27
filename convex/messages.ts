@@ -122,3 +122,24 @@ export const getUnreadCount = query({
     return totalUnread;
   },
 });
+
+export const deleteMessage = mutation({
+  args: {
+    messageId: v.id("messages"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const message = await ctx.db.get(args.messageId);
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    // Only allow sender to delete their own messages
+    if (message.senderId !== args.userId) {
+      throw new Error("You can only delete your own messages");
+    }
+
+    await ctx.db.delete(args.messageId);
+    return { success: true };
+  },
+});

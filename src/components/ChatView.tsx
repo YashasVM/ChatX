@@ -195,6 +195,7 @@ export function ChatView({ conversationId }: ChatViewProps) {
                   showAvatar={showAvatar}
                   isFirstInGroup={isFirstInGroup}
                   isLastInGroup={isLastInGroup}
+                  currentUserId={user?._id || ''}
                 />
               );
             })}
