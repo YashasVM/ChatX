@@ -56,6 +56,8 @@ export const list = query({
     // Enrich with participant info and last message
     const enriched = await Promise.all(
       userConversations.map(async (conv) => {
+        const now = Date.now();
+        const ONLINE_THRESHOLD = 2 * 60 * 1000; // 2 minutes
         const participants = await Promise.all(
           conv.participants.map(async (pid) => {
             const user = await ctx.db.get(pid);
@@ -64,7 +66,7 @@ export const list = query({
                   _id: user._id,
                   displayName: user.displayName,
                   avatarColor: user.avatarColor,
-                  isOnline: user.isOnline,
+                  isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD,
                 }
               : null;
           })
@@ -113,6 +115,8 @@ export const get = query({
     const conv = await ctx.db.get(args.conversationId);
     if (!conv) return null;
 
+    const now = Date.now();
+    const ONLINE_THRESHOLD = 2 * 60 * 1000; // 2 minutes
     const participants = await Promise.all(
       conv.participants.map(async (pid) => {
         const user = await ctx.db.get(pid);
@@ -121,7 +125,7 @@ export const get = query({
               _id: user._id,
               displayName: user.displayName,
               avatarColor: user.avatarColor,
-              isOnline: user.isOnline,
+              isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD,
             }
           : null;
       })

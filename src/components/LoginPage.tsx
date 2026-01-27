@@ -47,7 +47,7 @@ export function LoginPage() {
           </div>
           <h1 className="text-6xl font-bold text-cream mb-4 tracking-tight">ChatX</h1>
           <p className="text-cream/60 text-lg max-w-sm">
-            Secure messaging for your inner circle
+            Secure messaging for my inner circle people.
           </p>
         </div>
       </div>
