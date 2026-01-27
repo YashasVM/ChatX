@@ -12,6 +12,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
     "@tailwindcss/vite": "^4.1.18",
     "convex": "^1.31.6",
     "lucide-react": "^0.563.0",
