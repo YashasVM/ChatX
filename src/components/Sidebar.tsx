@@ -109,6 +109,11 @@ export function Sidebar() {
           </div>
         )}
       </div>
+
+      {/* Footer with attribution */}
+      <div className="p-3 border-t border-border text-center">
+        <p className="text-xs text-gray-light">Made by @Yashas.VM</p>
+      </div>
     </div>
   );
 }

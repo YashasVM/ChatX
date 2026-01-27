@@ -7,7 +7,23 @@
       "Bash(npm install:*)",
       "Bash(npx convex init:*)",
       "Bash(npx convex dev:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(set:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx cap init:*)",
+      "Bash(npx cap add:*)",
+      "Bash(npx cap sync:*)",
+      "Bash(where:*)",
+      "Bash(export:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(git config:*)",
+      "Bash(npx convex deploy:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)"
     ]
   }
 }
