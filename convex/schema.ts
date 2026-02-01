@@ -51,4 +51,29 @@ export default defineSchema({
   })
     .index("by_conversation", ["conversationId"])
     .index("by_expiry", ["expiresAt"]),
+
+  // Voice call tables
+  activeCalls: defineTable({
+    conversationId: v.id("conversations"),
+    initiatorId: v.id("users"),
+    participants: v.array(v.id("users")),
+    status: v.string(), // "ringing" | "active" | "ended"
+    callType: v.string(), // "1-on-1" | "group"
+    startedAt: v.number(),
+    endedAt: v.optional(v.number()),
+  })
+    .index("by_conversation", ["conversationId"])
+    .index("by_status", ["status"]),
+
+  callSignals: defineTable({
+    callId: v.id("activeCalls"),
+    fromUserId: v.id("users"),
+    toUserId: v.id("users"),
+    signalType: v.string(), // "offer" | "answer" | "ice-candidate"
+    signalData: v.string(), // JSON stringified WebRTC data
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_call_and_recipient", ["callId", "toUserId"])
+    .index("by_expiry", ["expiresAt"]),
 });

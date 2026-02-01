@@ -5,6 +5,7 @@ A secure, real-time messaging application with a Bauhaus-inspired minimal design
 ## Features
 
 - **Real-time Messaging** - Instant message delivery with live updates
+- **Voice Calls** - Free peer-to-peer voice calling (1-on-1 and group calls)
 - **Typing Indicators** - See when others are typing
 - **Online/Offline Status** - Know who's available
 - **Read Receipts** - Message delivery confirmation
@@ -14,6 +15,26 @@ A secure, real-time messaging application with a Bauhaus-inspired minimal design
 - **PWA Support** - Install as an app on any device
 - **Native Android App** - Full Android APK available
 - **Secure Authentication** - Username/password login with session tokens
+
+## Voice Calling
+
+ChatX now supports free voice calling using WebRTC:
+
+- **1-on-1 Calls** - Private voice calls between two users
+- **Group Calls** - Voice calls with up to 6 participants (mesh topology)
+- **Mute/Unmute** - Toggle your microphone during calls
+- **Call Notifications** - Real-time incoming call alerts
+- **No Server Costs** - Peer-to-peer connections using free Google STUN servers
+
+### How it works
+
+1. Click the phone icon in any conversation header
+2. The other user(s) will see an incoming call notification
+3. Accept or decline the call
+4. Voice is transmitted directly between browsers (P2P)
+5. Click the red end button to hang up
+
+**Note:** Voice calls require microphone permissions. Works best on modern browsers (Chrome, Firefox, Edge, Safari).
 
 ## Tech Stack
 
@@ -59,6 +80,7 @@ ChatX/
 │   ├── messages.ts         # Message CRUD operations
 │   ├── conversations.ts    # Conversation management
 │   ├── typing.ts           # Typing indicators
+│   ├── voiceCalls.ts       # Voice call signaling
 │   └── users.ts            # User queries
 ├── src/
 │   ├── components/         # React components
@@ -66,10 +88,15 @@ ChatX/
 │   │   ├── ChatView.tsx    # Message view
 │   │   ├── Sidebar.tsx     # Conversation list
 │   │   ├── LoginPage.tsx   # Authentication UI
+│   │   ├── VoiceCallModal.tsx    # Active call UI
+│   │   ├── IncomingCallModal.tsx # Incoming call notification
 │   │   └── ...
 │   ├── contexts/           # React contexts
 │   │   ├── AuthContext.tsx # Auth state management
-│   │   └── ChatContext.tsx # Chat state management
+│   │   ├── ChatContext.tsx # Chat state management
+│   │   └── VoiceCallContext.tsx  # Voice call state
+│   ├── hooks/              # Custom React hooks
+│   │   └── useWebRTC.ts    # WebRTC connection management
 │   ├── App.tsx             # Main app component
 │   ├── main.tsx            # Entry point
 │   └── index.css           # Global styles & theme

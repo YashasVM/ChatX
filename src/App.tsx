@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
+import { VoiceCallProvider } from './contexts/VoiceCallContext';
 import { LoginPage } from './components/LoginPage';
 import { ChatLayout } from './components/ChatLayout';
 import { AdminPage } from './components/AdminPage';
@@ -51,7 +52,9 @@ function App() {
 
   return (
     <ChatProvider>
-      <ChatLayout />
+      <VoiceCallProvider>
+        <ChatLayout />
+      </VoiceCallProvider>
     </ChatProvider>
   );
 }

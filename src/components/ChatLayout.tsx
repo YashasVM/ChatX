@@ -1,10 +1,14 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
+import { useVoiceCall } from '../contexts/VoiceCallContext';
 import { Sidebar } from './Sidebar';
 import { ChatView } from './ChatView';
 import { NewChatModal } from './NewChatModal';
 import { NewGroupModal } from './NewGroupModal';
 import { EmptyState } from './EmptyState';
+import { VoiceCallModal } from './VoiceCallModal';
+import { IncomingCallModal } from './IncomingCallModal';
+import { CallNotificationListener } from './CallNotificationListener';
 import { Menu, X } from 'lucide-react';
 
 export function ChatLayout() {
@@ -16,6 +20,7 @@ export function ChatLayout() {
     isMobileMenuOpen,
     setIsMobileMenuOpen
   } = useChat();
+  const { currentCall, incomingCall } = useVoiceCall();
 
   if (!user) return null;
 
@@ -69,6 +74,11 @@ export function ChatLayout() {
       {/* Modals */}
       {showNewChatModal && <NewChatModal />}
       {showNewGroupModal && <NewGroupModal />}
+
+      {/* Voice call components */}
+      <CallNotificationListener />
+      {currentCall && <VoiceCallModal />}
+      {incomingCall && <IncomingCallModal />}
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
+import { useVoiceCall } from '../contexts/VoiceCallContext';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Phone } from 'lucide-react';
+import type { Id } from '../../convex/_generated/dataModel';
 
 interface ChatViewProps {
   conversationId: string;
@@ -14,8 +16,10 @@ interface ChatViewProps {
 export function ChatView({ conversationId }: ChatViewProps) {
   const { user } = useAuth();
   const { setActiveConversationId } = useChat();
+  const { setCurrentCall, isInCall } = useVoiceCall();
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isStartingCall, setIsStartingCall] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -30,6 +34,10 @@ export function ChatView({ conversationId }: ChatViewProps) {
   const sendMessage = useMutation(api.messages.send);
   const markAsRead = useMutation(api.messages.markAsRead);
   const setTyping = useMutation(api.typing.setTyping);
+  const initiateCall = useMutation(api.voiceCalls.initiateCall);
+
+  // Check for active call in this conversation
+  const activeCall = useQuery(api.voiceCalls.getActiveCall, { conversationId } as any);
 
   // Get display info
   const otherParticipant = conversation?.participants.find(
@@ -73,6 +81,30 @@ export function ChatView({ conversationId }: ChatViewProps) {
     typingTimeoutRef.current = setTimeout(() => {
       setTyping({ conversationId, userId: user._id, isTyping: false } as any);
     }, 2000);
+  };
+
+  // Start a voice call
+  const handleStartCall = async () => {
+    if (!user || isStartingCall || isInCall) return;
+
+    setIsStartingCall(true);
+    try {
+      const callId = await initiateCall({
+        conversationId: conversationId as Id<"conversations">,
+        initiatorId: user._id as Id<"users">,
+      });
+
+      setCurrentCall({
+        callId,
+        conversationId: conversationId as Id<"conversations">,
+        isInitiator: true,
+        callType: conversation?.isGroup ? 'group' : '1-on-1',
+      });
+    } catch (error) {
+      console.error('Failed to start call:', error);
+    } finally {
+      setIsStartingCall(false);
+    }
   };
 
   const handleSend = async () => {
@@ -150,6 +182,20 @@ export function ChatView({ conversationId }: ChatViewProps) {
             }
           </p>
         </div>
+
+        {/* Voice call button */}
+        <button
+          onClick={handleStartCall}
+          disabled={isStartingCall || isInCall || !!activeCall}
+          className="p-2 hover:bg-cream-dark rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title={activeCall ? 'Call in progress' : isInCall ? 'Already in a call' : 'Start voice call'}
+        >
+          {isStartingCall ? (
+            <div className="w-5 h-5 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin" />
+          ) : (
+            <Phone className={`w-5 h-5 ${activeCall ? 'text-green-500' : 'text-charcoal'}`} />
+          )}
+        </button>
       </div>
 
       {/* Messages */}
