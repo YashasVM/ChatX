@@ -23,7 +23,9 @@
       "Bash(npx convex deploy:*)",
       "Bash(gh repo create:*)",
       "Bash(git remote add:*)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)"
     ]
   }
 }
