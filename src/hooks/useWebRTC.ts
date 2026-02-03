@@ -73,6 +73,7 @@ export function useWebRTC({
 }: UseWebRTCProps) {
   const peerConnectionsRef = useRef<Map<string, PeerConnection>>(new Map());
   const localStreamRef = useRef<MediaStream | null>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(enableVideo);
   const [isConnected, setIsConnected] = useState(false);
@@ -139,6 +140,7 @@ export function useWebRTC({
         video: enableVideo ? VIDEO_CONSTRAINTS : false,
       });
       localStreamRef.current = stream;
+      setLocalStream(stream);
       setIsVideoEnabled(enableVideo && stream.getVideoTracks().length > 0);
       return stream;
     } catch (err) {
@@ -329,6 +331,7 @@ export function useWebRTC({
     peerConnectionsRef.current.clear();
 
     // Reset state
+    setLocalStream(null);
     setRemoteStreams(new Map());
     setIsConnected(false);
     setIsMuted(false);
@@ -346,6 +349,6 @@ export function useWebRTC({
     isConnected,
     remoteStreams,
     error,
-    localStream: localStreamRef.current,
+    localStream,
   };
 }
