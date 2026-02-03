@@ -30,6 +30,7 @@ export function CallNotificationListener() {
         callId: call._id,
         conversationId: call.conversationId,
         callType: call.callType as "1-on-1" | "group",
+        hasVideo: call.hasVideo ?? false,
         initiatorName: call.initiator?.displayName || "Unknown",
         initiatorAvatarColor: call.initiator?.avatarColor || "#6B7280",
       });

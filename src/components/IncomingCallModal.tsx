@@ -2,7 +2,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useVoiceCall } from "../contexts/VoiceCallContext";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Phone, PhoneOff, Users } from "lucide-react";
+import { Phone, PhoneOff, Users, Video } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export function IncomingCallModal() {
@@ -23,6 +23,7 @@ export function IncomingCallModal() {
         conversationId: incomingCall.conversationId,
         isInitiator: false,
         callType: incomingCall.callType,
+        hasVideo: incomingCall.hasVideo,
       });
       setIncomingCall(null);
     }
@@ -59,6 +60,8 @@ export function IncomingCallModal() {
           <p className="text-gray">
             {incomingCall.callType === "group"
               ? `${incomingCall.initiatorName} is calling...`
+              : incomingCall.hasVideo
+              ? "Incoming video call..."
               : "Incoming voice call..."}
           </p>
         </div>
@@ -77,7 +80,7 @@ export function IncomingCallModal() {
             className="p-5 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
             title="Accept"
           >
-            <Phone className="w-7 h-7" />
+            {incomingCall.hasVideo ? <Video className="w-7 h-7" /> : <Phone className="w-7 h-7" />}
           </button>
         </div>
       </div>

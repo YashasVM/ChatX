@@ -7,6 +7,7 @@ import { NewChatModal } from './NewChatModal';
 import { NewGroupModal } from './NewGroupModal';
 import { EmptyState } from './EmptyState';
 import { VoiceCallModal } from './VoiceCallModal';
+import { VideoCallModal } from './VideoCallModal';
 import { IncomingCallModal } from './IncomingCallModal';
 import { CallNotificationListener } from './CallNotificationListener';
 import { Menu, X } from 'lucide-react';
@@ -75,9 +76,9 @@ export function ChatLayout() {
       {showNewChatModal && <NewChatModal />}
       {showNewGroupModal && <NewGroupModal />}
 
-      {/* Voice call components */}
+      {/* Voice/Video call components */}
       <CallNotificationListener />
-      {currentCall && <VoiceCallModal />}
+      {currentCall && (currentCall.hasVideo ? <VideoCallModal /> : <VoiceCallModal />)}
       {incomingCall && <IncomingCallModal />}
     </div>
   );

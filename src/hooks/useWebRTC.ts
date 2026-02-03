@@ -1,7 +1,29 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
-const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
+const ICE_SERVERS = [
+  // Primary STUN servers (free)
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
+  { urls: "stun:stun2.l.google.com:19302" },
+  // OpenRelay free TURN servers for NAT traversal
+  { urls: "stun:openrelay.metered.ca:80" },
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+];
 
 interface SignalData {
   toUserId: string;
@@ -24,6 +46,7 @@ interface UseWebRTCProps {
   incomingSignals: IncomingSignal[];
   onSignalConsumed: (signalId: Id<"callSignals">) => void;
   isInitiator: boolean;
+  enableVideo?: boolean;
 }
 
 interface PeerConnection {
@@ -31,6 +54,12 @@ interface PeerConnection {
   connection: RTCPeerConnection;
   remoteStream: MediaStream | null;
 }
+
+const VIDEO_CONSTRAINTS = {
+  width: { ideal: 1280, max: 1920 },
+  height: { ideal: 720, max: 1080 },
+  frameRate: { ideal: 30, max: 30 },
+};
 
 export function useWebRTC({
   callId,
@@ -40,10 +69,12 @@ export function useWebRTC({
   incomingSignals,
   onSignalConsumed,
   isInitiator,
+  enableVideo = false,
 }: UseWebRTCProps) {
   const peerConnectionsRef = useRef<Map<string, PeerConnection>>(new Map());
   const localStreamRef = useRef<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(enableVideo);
   const [isConnected, setIsConnected] = useState(false);
   const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +127,7 @@ export function useWebRTC({
     [onSignal]
   );
 
-  // Get local audio stream
+  // Get local media stream (audio and optionally video)
   const getLocalStream = useCallback(async (): Promise<MediaStream> => {
     if (localStreamRef.current) {
       return localStreamRef.current;
@@ -105,19 +136,28 @@ export function useWebRTC({
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: false,
+        video: enableVideo ? VIDEO_CONSTRAINTS : false,
       });
       localStreamRef.current = stream;
+      setIsVideoEnabled(enableVideo && stream.getVideoTracks().length > 0);
       return stream;
     } catch (err) {
-      const errorMessage =
-        err instanceof Error && err.name === "NotAllowedError"
-          ? "Microphone access denied. Please allow microphone access to use voice calls."
-          : "Failed to access microphone.";
+      let errorMessage = "Failed to access media devices.";
+      if (err instanceof Error) {
+        if (err.name === "NotAllowedError") {
+          errorMessage = enableVideo
+            ? "Camera/microphone access denied. Please allow access to use video calls."
+            : "Microphone access denied. Please allow microphone access to use voice calls.";
+        } else if (err.name === "NotFoundError") {
+          errorMessage = enableVideo
+            ? "No camera or microphone found."
+            : "No microphone found.";
+        }
+      }
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [enableVideo]);
 
   // Add local stream to a peer connection
   const addLocalStreamToPeer = useCallback(
@@ -263,6 +303,17 @@ export function useWebRTC({
     }
   }, []);
 
+  // Toggle video
+  const toggleVideo = useCallback(() => {
+    if (localStreamRef.current) {
+      const videoTrack = localStreamRef.current.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        setIsVideoEnabled(videoTrack.enabled);
+      }
+    }
+  }, []);
+
   // Cleanup all connections
   const cleanup = useCallback(() => {
     // Stop local stream
@@ -281,14 +332,17 @@ export function useWebRTC({
     setRemoteStreams(new Map());
     setIsConnected(false);
     setIsMuted(false);
+    setIsVideoEnabled(false);
     setError(null);
     processedSignalsRef.current.clear();
   }, []);
 
   return {
     toggleMute,
+    toggleVideo,
     cleanup,
     isMuted,
+    isVideoEnabled,
     isConnected,
     remoteStreams,
     error,

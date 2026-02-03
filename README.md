@@ -5,6 +5,7 @@ A secure, real-time messaging application with a Bauhaus-inspired minimal design
 ## Features
 
 - **Real-time Messaging** - Instant message delivery with live updates
+- **Video Calls** - Free peer-to-peer HD video calling (1-on-1 and group calls)
 - **Voice Calls** - Free peer-to-peer voice calling (1-on-1 and group calls)
 - **Typing Indicators** - See when others are typing
 - **Online/Offline Status** - Know who's available
@@ -16,25 +17,42 @@ A secure, real-time messaging application with a Bauhaus-inspired minimal design
 - **Native Android App** - Full Android APK available
 - **Secure Authentication** - Username/password login with session tokens
 
-## Voice Calling
+## Video & Voice Calling
 
-ChatX now supports free voice calling using WebRTC:
+ChatX supports free video and voice calling using WebRTC:
 
+### Video Calls
+- **HD Video** - Up to 1080p at 30fps video quality
+- **1-on-1 Video Calls** - Private video calls between two users
+- **Group Video Calls** - Video calls with up to 6 participants (mesh topology)
+- **Camera Toggle** - Turn your camera on/off during calls
+- **Mute/Unmute** - Toggle your microphone during calls
+- **Picture-in-Picture** - Minimize video call to floating window
+- **No Server Costs** - Peer-to-peer connections using free STUN/TURN servers
+
+### Voice Calls
 - **1-on-1 Calls** - Private voice calls between two users
 - **Group Calls** - Voice calls with up to 6 participants (mesh topology)
 - **Mute/Unmute** - Toggle your microphone during calls
 - **Call Notifications** - Real-time incoming call alerts
-- **No Server Costs** - Peer-to-peer connections using free Google STUN servers
 
 ### How it works
 
-1. Click the phone icon in any conversation header
+1. Click the video (📹) or phone (📞) icon in any conversation header
 2. The other user(s) will see an incoming call notification
 3. Accept or decline the call
-4. Voice is transmitted directly between browsers (P2P)
+4. Media is transmitted directly between browsers (P2P)
 5. Click the red end button to hang up
 
-**Note:** Voice calls require microphone permissions. Works best on modern browsers (Chrome, Firefox, Edge, Safari).
+### Technical Details
+
+- **WebRTC** - Real-time peer-to-peer communication
+- **STUN Servers** - Google's free STUN servers for NAT traversal
+- **TURN Servers** - Free OpenRelay TURN servers for restrictive firewalls
+- **Mesh Topology** - Direct connections between all participants (up to 6)
+- **Signaling** - Uses Convex real-time database for WebRTC signaling
+
+**Note:** Calls require camera/microphone permissions. Works best on modern browsers (Chrome, Firefox, Edge, Safari).
 
 ## Tech Stack
 
@@ -88,7 +106,8 @@ ChatX/
 │   │   ├── ChatView.tsx    # Message view
 │   │   ├── Sidebar.tsx     # Conversation list
 │   │   ├── LoginPage.tsx   # Authentication UI
-│   │   ├── VoiceCallModal.tsx    # Active call UI
+│   │   ├── VoiceCallModal.tsx    # Voice call UI
+│   │   ├── VideoCallModal.tsx    # Video call UI
 │   │   ├── IncomingCallModal.tsx # Incoming call notification
 │   │   └── ...
 │   ├── contexts/           # React contexts
