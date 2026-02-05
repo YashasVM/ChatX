@@ -2,24 +2,6 @@
 
 A secure, real-time messaging application with a Bauhaus-inspired minimal design. Built for small teams and personal use with full message sync between web and Android.
 
----
-
-## Screenshots
-
-<!-- Add your screenshots to the /screenshots folder and update the paths below -->
-
-| Login | Chat | Video Call |
-|:-----:|:----:|:----------:|
-| ![Login](screenshots/login.png) | ![Chat](screenshots/chat.png) | ![Video Call](screenshots/video-call.png) |
-
-| Group Chat | Sidebar | Incoming Call |
-|:----------:|:-------:|:-------------:|
-| ![Group](screenshots/group-chat.png) | ![Sidebar](screenshots/sidebar.png) | ![Incoming](screenshots/incoming-call.png) |
-
-> **Note:** To add screenshots, capture images from the running app and save them in the `/screenshots` folder with the names shown above.
-
----
-
 ## Features
 
 - **Real-time Messaging** - Instant message delivery with live updates
