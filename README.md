@@ -93,19 +93,6 @@ ChatX supports free video and voice calling using WebRTC:
 - **Cloudflare Pages** - Frontend hosting (free tier)
 - **Convex Cloud** - Backend hosting
 
-## Design System
-
-Bauhaus-inspired minimal design with:
-
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Cream | `#FAF8F5` | Background |
-| Charcoal | `#1a1a1a` | Text, primary buttons |
-| Red | `#E63946` | Accent, notifications |
-| Gray | `#6B7280` | Secondary text |
-
-**Font:** Space Grotesk
-
 ## Project Structure
 
 ```
