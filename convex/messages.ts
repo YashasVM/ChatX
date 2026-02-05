@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { DEFAULT_MESSAGE_LIMIT } from "./constants";
 
 export const send = mutation({
   args: {
@@ -47,7 +48,7 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 100;
+    const limit = args.limit ?? DEFAULT_MESSAGE_LIMIT;
 
     const messages = await ctx.db
       .query("messages")
