@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { ONLINE_THRESHOLD_MS } from "./constants";
 
 export const create = mutation({
   args: {
@@ -57,7 +58,6 @@ export const list = query({
     const enriched = await Promise.all(
       userConversations.map(async (conv) => {
         const now = Date.now();
-        const ONLINE_THRESHOLD = 2 * 60 * 1000; // 2 minutes
         const participants = await Promise.all(
           conv.participants.map(async (pid) => {
             const user = await ctx.db.get(pid);
@@ -66,7 +66,7 @@ export const list = query({
                   _id: user._id,
                   displayName: user.displayName,
                   avatarColor: user.avatarColor,
-                  isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD,
+                  isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD_MS,
                 }
               : null;
           })
@@ -116,7 +116,6 @@ export const get = query({
     if (!conv) return null;
 
     const now = Date.now();
-    const ONLINE_THRESHOLD = 2 * 60 * 1000; // 2 minutes
     const participants = await Promise.all(
       conv.participants.map(async (pid) => {
         const user = await ctx.db.get(pid);
