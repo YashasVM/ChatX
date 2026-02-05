@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { DEFAULT_MESSAGE_LIMIT } from "./constants";
+import { DEFAULT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH } from "./constants";
 
 export const send = mutation({
   args: {
@@ -9,14 +9,20 @@ export const send = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    if (!args.content.trim()) {
+    const trimmedContent = args.content.trim();
+
+    if (!trimmedContent) {
       throw new Error("Message cannot be empty");
+    }
+
+    if (trimmedContent.length > MAX_MESSAGE_LENGTH) {
+      throw new Error(`Message exceeds maximum length of ${MAX_MESSAGE_LENGTH} characters`);
     }
 
     const messageId = await ctx.db.insert("messages", {
       conversationId: args.conversationId,
       senderId: args.senderId,
-      content: args.content.trim(),
+      content: trimmedContent,
       readBy: [args.senderId],
       createdAt: Date.now(),
     });

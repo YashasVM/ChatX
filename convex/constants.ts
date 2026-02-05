@@ -11,3 +11,6 @@ export const TYPING_INDICATOR_EXPIRY_MS = 5000; // 5 seconds
 
 // Message list default limit
 export const DEFAULT_MESSAGE_LIMIT = 100;
+
+// Maximum message content length
+export const MAX_MESSAGE_LENGTH = 4000;
