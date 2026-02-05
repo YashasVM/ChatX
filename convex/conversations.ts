@@ -124,7 +124,7 @@ export const get = query({
               _id: user._id,
               displayName: user.displayName,
               avatarColor: user.avatarColor,
-              isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD,
+              isOnline: user.isOnline && (now - user.lastSeen) < ONLINE_THRESHOLD_MS,
             }
           : null;
       })
@@ -150,6 +150,34 @@ export const addParticipant = mutation({
     if (!conv.participants.includes(args.userId)) {
       await ctx.db.patch(args.conversationId, {
         participants: [...conv.participants, args.userId],
+      });
+    }
+  },
+});
+
+export const removeParticipant = mutation({
+  args: {
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+    requesterId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const conv = await ctx.db.get(args.conversationId);
+    if (!conv) throw new Error("Conversation not found");
+    if (!conv.isGroup) throw new Error("Cannot remove participants from direct messages");
+
+    // Only the group creator can remove others, or users can remove themselves
+    if (args.requesterId !== conv.createdBy && args.requesterId !== args.userId) {
+      throw new Error("Only the group creator can remove other participants");
+    }
+
+    if (conv.participants.includes(args.userId)) {
+      const newParticipants = conv.participants.filter((p) => p !== args.userId);
+      if (newParticipants.length < 2) {
+        throw new Error("Group must have at least 2 participants");
+      }
+      await ctx.db.patch(args.conversationId, {
+        participants: newParticipants,
       });
     }
   },
