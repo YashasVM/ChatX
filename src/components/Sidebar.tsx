@@ -1,18 +1,36 @@
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { ConversationItem } from './ConversationItem';
-import { LogOut, Plus, Users, MessageCircle } from 'lucide-react';
+import { LogOut, Plus, Users, MessageCircle, Search } from 'lucide-react';
 
 export function Sidebar() {
   const { user, logout } = useAuth();
   const { setShowNewChatModal, setShowNewGroupModal, setIsMobileMenuOpen } = useChat();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const conversations = useQuery(
     api.conversations.list,
     user ? { userId: user._id } as any : "skip"
   );
+
+  // Filter conversations based on search query
+  const filteredConversations = conversations?.filter((conv: any) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+
+    // Search in group name
+    if (conv.isGroup && conv.groupName?.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    // Search in participant names
+    return conv.participants.some((p: any) =>
+      p?.displayName?.toLowerCase().includes(query)
+    );
+  });
 
   const handleNewChat = () => {
     setShowNewChatModal(true);
@@ -60,23 +78,39 @@ export function Sidebar() {
       </div>
 
       {/* Action buttons */}
-      <div className="p-4 flex gap-2">
-        <button
-          onClick={handleNewChat}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-charcoal text-cream rounded-xl
-                   font-medium text-sm hover:bg-charcoal-light transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          New Chat
-        </button>
-        <button
-          onClick={handleNewGroup}
-          className="flex items-center justify-center p-2.5 bg-cream-dark text-charcoal rounded-xl
-                   hover:bg-border transition-colors"
-          title="New Group"
-        >
-          <Users className="w-5 h-5" />
-        </button>
+      <div className="p-4 space-y-3">
+        {/* Search bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search conversations..."
+            className="w-full pl-9 pr-4 py-2 bg-cream-dark border border-border rounded-lg
+                     text-sm text-charcoal placeholder:text-gray-light
+                     focus:outline-none focus:border-charcoal transition-colors"
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleNewChat}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-charcoal text-cream rounded-xl
+                     font-medium text-sm hover:bg-charcoal-light transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            New Chat
+          </button>
+          <button
+            onClick={handleNewGroup}
+            className="flex items-center justify-center p-2.5 bg-cream-dark text-charcoal rounded-xl
+                     hover:bg-border transition-colors"
+            title="New Group"
+          >
+            <Users className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Conversations list */}
@@ -93,17 +127,21 @@ export function Sidebar() {
               </div>
             ))}
           </div>
-        ) : conversations.length === 0 ? (
+        ) : filteredConversations.length === 0 ? (
           <div className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-cream-dark rounded-full flex items-center justify-center">
               <MessageCircle className="w-8 h-8 text-gray" />
             </div>
-            <p className="text-gray text-sm">No conversations yet</p>
-            <p className="text-gray-light text-sm mt-1">Start a new chat!</p>
+            <p className="text-gray text-sm">
+              {searchQuery ? 'No matching conversations' : 'No conversations yet'}
+            </p>
+            <p className="text-gray-light text-sm mt-1">
+              {searchQuery ? 'Try a different search' : 'Start a new chat!'}
+            </p>
           </div>
         ) : (
           <div className="py-2">
-            {conversations.map((conv: any) => (
+            {filteredConversations.map((conv: any) => (
               <ConversationItem key={conv._id} conversation={conv as any} />
             ))}
           </div>
