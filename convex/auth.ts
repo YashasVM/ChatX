@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { SESSION_EXPIRY_MS } from "./constants";
 
 // Simple hash function for passwords (in production, use bcrypt via action)
 function simpleHash(password: string): string {
@@ -71,7 +72,7 @@ export const register = mutation({
     await ctx.db.insert("sessions", {
       userId,
       token,
-      expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
+      expiresAt: Date.now() + SESSION_EXPIRY_MS,
       createdAt: Date.now(),
     });
 
@@ -109,7 +110,7 @@ export const login = mutation({
     await ctx.db.insert("sessions", {
       userId: user._id,
       token,
-      expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      expiresAt: Date.now() + SESSION_EXPIRY_MS,
       createdAt: Date.now(),
     });
 
