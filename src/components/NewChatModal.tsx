@@ -9,6 +9,7 @@ export function NewChatModal() {
   const { user } = useAuth();
   const { setShowNewChatModal, setActiveConversationId } = useChat();
   const [search, setSearch] = useState('');
+  const [startingChatWith, setStartingChatWith] = useState<string | null>(null);
 
   const allUsers = useQuery(api.users.getAll);
   const createConversation = useMutation(api.conversations.create);
@@ -33,8 +34,9 @@ export function NewChatModal() {
   }, [handleKeyDown]);
 
   const handleStartChat = async (userId: string) => {
-    if (!user || !userId) return;
+    if (!user || !userId || startingChatWith) return;
 
+    setStartingChatWith(userId);
     try {
       const conversationId = await createConversation({
         participants: [user._id, userId],
@@ -46,6 +48,7 @@ export function NewChatModal() {
       setShowNewChatModal(false);
     } catch (error) {
       console.error('Failed to create conversation:', error);
+      setStartingChatWith(null);
     }
   };
 
@@ -117,21 +120,29 @@ export function NewChatModal() {
               <p className="text-gray">No users found</p>
             </div>
           ) : (
-            <div className="pb-4">
+            <div className="pb-4" role="list" aria-label="Available users">
               {filteredUsers.map((u) => (
                 <button
                   key={u._id}
                   onClick={() => handleStartChat(u._id)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cream-dark transition-colors"
+                  disabled={startingChatWith !== null}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cream-dark transition-colors disabled:opacity-50"
+                  role="listitem"
                 >
                   <div className="relative">
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium"
-                      style={{ backgroundColor: u.avatarColor }}
-                    >
-                      {u.displayName.charAt(0).toUpperCase()}
-                    </div>
-                    {u.isOnline && (
+                    {startingChatWith === u._id ? (
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-cream-dark">
+                        <div className="w-5 h-5 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-medium"
+                        style={{ backgroundColor: u.avatarColor }}
+                      >
+                        {u.displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    {u.isOnline && startingChatWith !== u._id && (
                       <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
                     )}
                   </div>
