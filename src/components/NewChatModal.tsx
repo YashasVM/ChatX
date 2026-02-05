@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
 import { useQuery, useMutation } from 'convex/react';
@@ -20,6 +20,18 @@ export function NewChatModal() {
         u.username.toLowerCase().includes(search.toLowerCase()))
   );
 
+  // Handle escape key to close modal
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setShowNewChatModal(false);
+    }
+  }, [setShowNewChatModal]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   const handleStartChat = async (userId: string) => {
     if (!user || !userId) return;
 
@@ -38,21 +50,28 @@ export function NewChatModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-chat-title"
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-charcoal/50"
         onClick={() => setShowNewChatModal(false)}
+        aria-hidden="true"
       />
 
       {/* Modal */}
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-border">
-          <h2 className="text-xl font-semibold text-charcoal">New Chat</h2>
+          <h2 id="new-chat-title" className="text-xl font-semibold text-charcoal">New Chat</h2>
           <button
             onClick={() => setShowNewChatModal(false)}
             className="p-2 hover:bg-cream-dark rounded-lg transition-colors"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5 text-gray" />
           </button>
@@ -61,12 +80,13 @@ export function NewChatModal() {
         {/* Search */}
         <div className="p-4">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray" aria-hidden="true" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search users..."
+              aria-label="Search users"
               className="w-full pl-12 pr-4 py-3 bg-cream-dark border border-border rounded-xl
                        text-charcoal placeholder:text-gray-light
                        focus:outline-none focus:border-charcoal transition-colors"
