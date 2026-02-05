@@ -182,3 +182,33 @@ export const removeParticipant = mutation({
     }
   },
 });
+
+export const updateGroupName = mutation({
+  args: {
+    conversationId: v.id("conversations"),
+    groupName: v.string(),
+    requesterId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const conv = await ctx.db.get(args.conversationId);
+    if (!conv) throw new Error("Conversation not found");
+    if (!conv.isGroup) throw new Error("Cannot update name of direct messages");
+
+    // Only participants can update the group name
+    if (!conv.participants.includes(args.requesterId)) {
+      throw new Error("Only group participants can update the group name");
+    }
+
+    const trimmedName = args.groupName.trim();
+    if (trimmedName.length === 0) {
+      throw new Error("Group name cannot be empty");
+    }
+    if (trimmedName.length > 50) {
+      throw new Error("Group name cannot exceed 50 characters");
+    }
+
+    await ctx.db.patch(args.conversationId, {
+      groupName: trimmedName,
+    });
+  },
+});
