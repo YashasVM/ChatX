@@ -13,6 +13,8 @@ interface ChatViewProps {
   conversationId: string;
 }
 
+const MAX_MESSAGE_LENGTH = 4000;
+
 export function ChatView({ conversationId }: ChatViewProps) {
   const { user } = useAuth();
   const { setActiveConversationId } = useChat();
@@ -120,7 +122,7 @@ export function ChatView({ conversationId }: ChatViewProps) {
   };
 
   const handleSend = async () => {
-    if (!message.trim() || !user || isSending) return;
+    if (!message.trim() || !user || isSending || message.length > MAX_MESSAGE_LENGTH) return;
 
     setIsSending(true);
     const messageText = message.trim();
@@ -279,15 +281,21 @@ export function ChatView({ conversationId }: ChatViewProps) {
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               rows={1}
-              className="w-full px-4 py-3 bg-cream-dark border border-border rounded-xl resize-none
+              maxLength={MAX_MESSAGE_LENGTH}
+              className={`w-full px-4 py-3 bg-cream-dark border rounded-xl resize-none
                        text-charcoal placeholder:text-gray-light
-                       focus:outline-none focus:border-charcoal
-                       transition-colors"
+                       focus:outline-none transition-colors
+                       ${message.length > MAX_MESSAGE_LENGTH * 0.9 ? 'border-red focus:border-red' : 'border-border focus:border-charcoal'}`}
               style={{
                 minHeight: '48px',
                 maxHeight: '120px',
               }}
             />
+            {message.length > MAX_MESSAGE_LENGTH * 0.8 && (
+              <div className={`absolute right-3 bottom-1 text-xs ${message.length > MAX_MESSAGE_LENGTH * 0.9 ? 'text-red' : 'text-gray'}`}>
+                {message.length}/{MAX_MESSAGE_LENGTH}
+              </div>
+            )}
           </div>
           <button
             onClick={handleSend}
