@@ -277,11 +277,15 @@ export function ChatView({ conversationId }: ChatViewProps) {
               onChange={(e) => {
                 setMessage(e.target.value);
                 handleTyping();
+                // Auto-resize textarea
+                e.target.style.height = '48px';
+                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
               }}
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               rows={1}
               maxLength={MAX_MESSAGE_LENGTH}
+              aria-label="Message input"
               className={`w-full px-4 py-3 bg-cream-dark border rounded-xl resize-none
                        text-charcoal placeholder:text-gray-light
                        focus:outline-none transition-colors
