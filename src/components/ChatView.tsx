@@ -83,6 +83,18 @@ export function ChatView({ conversationId }: ChatViewProps) {
     }, 2000);
   };
 
+  // Cleanup typing indicator on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (user) {
+        setTyping({ conversationId, userId: user._id, isTyping: false } as any);
+      }
+    };
+  }, [conversationId, user, setTyping]);
+
   // Start a voice call
   const handleStartCall = async () => {
     if (!user || isStartingCall || isInCall) return;
