@@ -1,90 +1,56 @@
-# Welcome to your Convex functions directory!
+# ChatX - Convex Backend
 
-Write your Convex functions here.
-See https://docs.convex.dev/functions for more.
+This directory contains all the Convex serverless functions for the ChatX messaging application.
 
-A query function that takes two arguments looks like:
+## Structure
 
-```ts
-// convex/myFunctions.ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
+| File | Description |
+|------|-------------|
+| `schema.ts` | Database schema definitions for all tables |
+| `auth.ts` | Authentication functions (login, register, logout, session management) |
+| `messages.ts` | Message CRUD operations and read receipts |
+| `conversations.ts` | Conversation management (create, list, participants) |
+| `typing.ts` | Real-time typing indicators |
+| `voiceCalls.ts` | WebRTC voice/video call signaling |
+| `users.ts` | User queries and online status |
+| `constants.ts` | Shared configuration constants |
+| `admin.ts` | Admin utilities |
 
-export const myQueryFunction = query({
-  // Validators for arguments.
-  args: {
-    first: v.number(),
-    second: v.string(),
-  },
+## Database Tables
 
-  // Function implementation.
-  handler: async (ctx, args) => {
-    // Read the database as many times as you need here.
-    // See https://docs.convex.dev/database/reading-data.
-    const documents = await ctx.db.query("tablename").collect();
+- **users** - User accounts with authentication
+- **sessions** - Active login sessions
+- **conversations** - Chat threads (1-on-1 and groups)
+- **messages** - Chat messages with read receipts
+- **typingIndicators** - Real-time typing status
+- **activeCalls** - Voice/video call sessions
+- **callSignals** - WebRTC signaling data
 
-    // Arguments passed from the client are properties of the args object.
-    console.log(args.first, args.second);
+## Usage
 
-    // Write arbitrary JavaScript here: filter, aggregate, build derived data,
-    // remove non-public properties, or create new objects.
-    return documents;
-  },
-});
+### Development
+
+```bash
+npx convex dev
 ```
 
-Using this query function in a React component looks like:
+### Deployment
 
-```ts
-const data = useQuery(api.myFunctions.myQueryFunction, {
-  first: 10,
-  second: "hello",
-});
+```bash
+npx convex deploy
 ```
 
-A mutation function looks like:
+## Documentation
 
-```ts
-// convex/myFunctions.ts
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+For more information about Convex:
+- [Convex Documentation](https://docs.convex.dev)
+- [Convex Functions](https://docs.convex.dev/functions)
+- [Database Reading](https://docs.convex.dev/database/reading-data)
+- [Database Writing](https://docs.convex.dev/database/writing-data)
 
-export const myMutationFunction = mutation({
-  // Validators for arguments.
-  args: {
-    first: v.string(),
-    second: v.string(),
-  },
+---
 
-  // Function implementation.
-  handler: async (ctx, args) => {
-    // Insert or modify documents in the database here.
-    // Mutations can also read from the database like queries.
-    // See https://docs.convex.dev/database/writing-data.
-    const message = { body: args.first, author: args.second };
-    const id = await ctx.db.insert("messages", message);
-
-    // Optionally, return a value from your mutation.
-    return await ctx.db.get("messages", id);
-  },
-});
-```
-
-Using this mutation function in a React component looks like:
-
-```ts
-const mutation = useMutation(api.myFunctions.myMutationFunction);
-function handleButtonPress() {
-  // fire and forget, the most common way to use mutations
-  mutation({ first: "Hello!", second: "me" });
-  // OR
-  // use the result once the mutation has completed
-  mutation({ first: "Hello!", second: "me" }).then((result) =>
-    console.log(result),
-  );
-}
-```
-
-Use the Convex CLI to push your functions to a deployment. See everything
-the Convex CLI can do by running `npx convex -h` in your project root
-directory. To learn more, launch the docs with `npx convex docs`.
+<p align="center">
+  <b>Made by @Yashas.VM</b><br>
+  <i>Co-Powered by Claude</i>
+</p>
