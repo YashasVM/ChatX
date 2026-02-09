@@ -2,6 +2,12 @@
 
 A secure, real-time messaging application with a Bauhaus-inspired minimal design. Built for small teams and personal use with full message sync between web and Android.
 
+## Use it here:
+
+https://chatx.yashasvm.workers.dev/  (Old Link)
+
+https://2.yashasvm.workers.dev/      (New Link)
+
 ## Features
 
 - **Real-time Messaging** - Instant message delivery with live updates
